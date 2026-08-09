@@ -6,7 +6,7 @@ on:
       - 'v*' # e.g. v0.1.0-preview.1
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -31,15 +31,8 @@ jobs:
           dotnet pack src/MigrationLint.Cli/MigrationLint.Cli.csproj --configuration Release --no-build --output ./artifacts
           dotnet pack src/MigrationLint.Core/MigrationLint.Core.csproj --configuration Release --no-build --output ./artifacts
 
-      - name: Push to NuGet
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          dotnet nuget push "./artifacts/*.nupkg" \
-            --api-key "$NUGET_API_KEY" \
-            --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate
-
+      # Distribution is GitHub-only: the built .nupkg files are attached to the release so
+      # developers can install the tool from source or from the downloaded package.
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:

@@ -6,7 +6,8 @@ All notable changes to MigrationLint are documented here. Format follows
 ## [0.1.0-preview.1] — unreleased
 
 Tag `v0.1.0-preview.1` to cut this release; MinVer derives the package version from the tag and
-the release workflow pushes to NuGet.
+the release workflow builds, tests, packs, and attaches the `.nupkg` files to a GitHub Release.
+Distribution is GitHub-only — install as a `dotnet tool` from source (see the README).
 
 ### Added
 - IR + Roslyn syntax parser (no build, no DbContext load): argument reader, migration

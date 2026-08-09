@@ -54,9 +54,28 @@ and provider-aware from the ground up. See [docs/PHASE0-DECISION.md](docs/PHASE0
 
 ## Install
 
+MigrationLint is distributed from this repository (not NuGet). Install it as a local `dotnet tool`
+straight from source:
+
 ```bash
-dotnet tool install -g MigrationLint.Cli
+git clone https://github.com/BeerRebek/MigrationLint.git
+cd MigrationLint
+dotnet pack src/MigrationLint.Cli/MigrationLint.Cli.csproj -c Release -o ./artifacts
+dotnet tool install -g --add-source ./artifacts MigrationLint.Cli
 ```
+
+`migrationlint` is then on your PATH. To update later, `git pull`, re-pack, and
+`dotnet tool update -g --add-source ./artifacts MigrationLint.Cli`.
+
+Prefer not to install a tool? Run it directly:
+
+```bash
+dotnet run --project src/MigrationLint.Cli -- check ./path/to/Migrations
+```
+
+Tagged releases also attach the built `.nupkg` files to the
+[GitHub Releases](https://github.com/BeerRebek/MigrationLint/releases) page — download one and
+`dotnet tool install -g --add-source <folder> MigrationLint.Cli`.
 
 ## Use
 
