@@ -3,7 +3,9 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
-## [0.2.0] — unreleased
+## [0.2.0] — 2026-08-10
+
+Eight new rules (13 → 21), a code fix, a markdown format, and `init`.
 
 ### Added
 - Four new lock/downtime rules (ship as **warning** per the new-rule policy):
