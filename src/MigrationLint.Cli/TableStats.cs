@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using MigrationLint.Core.Model;
+using MySqlConnector;
 using Npgsql;
 
 namespace MigrationLint.Cli;
@@ -36,6 +37,9 @@ public static class TableStats
                     break;
                 case Provider.SqlServer:
                     QuerySqlServer(connectionString, tables, result);
+                    break;
+                case Provider.MySql:
+                    QueryMySql(connectionString, tables, result);
                     break;
                 default:
                     stderr.WriteLine($"warning: --connection is not supported for provider '{provider}' yet; ignoring live stats.");
@@ -73,6 +77,34 @@ public static class TableStats
         while (reader.Read())
         {
             into[reader.GetString(0)] = reader.GetInt64(1);
+        }
+    }
+
+    private static void QueryMySql(string cs, IReadOnlyCollection<string> tables, Dictionary<string, long> into)
+    {
+        using var conn = new MySqlConnection(cs);
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandTimeout = TimeoutSeconds;
+        var names = tables.ToArray();
+        var placeholders = string.Join(",", names.Select((_, i) => "@t" + i));
+        // information_schema.TABLES.TABLE_ROWS is an InnoDB estimate — metadata, no scan.
+        cmd.CommandText = $@"
+            SELECT TABLE_NAME, TABLE_ROWS
+            FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ({placeholders});";
+        for (var i = 0; i < names.Length; i++)
+        {
+            cmd.Parameters.AddWithValue("@t" + i, names[i]);
+        }
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (!reader.IsDBNull(1))
+            {
+                into[reader.GetString(0)] = Convert.ToInt64(reader.GetValue(1));
+            }
         }
     }
 

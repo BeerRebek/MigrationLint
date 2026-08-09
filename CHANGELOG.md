@@ -3,11 +3,10 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
-## [0.1.0-preview.1] — unreleased
+## [0.1.0] — 2026-08-09
 
-Tag `v0.1.0-preview.1` to cut this release; MinVer derives the package version from the tag and
-the release workflow builds, tests, packs, and attaches the `.nupkg` files to a GitHub Release.
-Distribution is GitHub-only — install as a `dotnet tool` from source (see the README).
+First stable release. Distribution is GitHub-only — install as a `dotnet tool` from source or a
+release `.nupkg` (see the README). Reached here through previews `0.1.0-preview.1` … `preview.5`.
 
 ### Added
 - IR + Roslyn syntax parser (no build, no DbContext load): argument reader, migration
@@ -31,7 +30,7 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
 - **Live-DB awareness** (opt-in `--connection`, read-only) — estimate-based row counts suppress
   false positives: empty tables no longer trigger MIG004/MIG006, and small tables (by real row
   count, `--small-rows` / `options.smallTableRowThreshold`) no longer trigger MIG007/008/009.
-  PostgreSQL + SQL Server; fails soft when the database is unreachable.
+  PostgreSQL, SQL Server, and MySQL; fails soft when the database is unreachable.
 - Reusable **GitHub Action** (`uses: BeerRebek/MigrationLint@v1`) with inline PR annotations,
   optional SARIF for code scanning, `changed-only` PR-diff mode, and a self-scan workflow that
   dogfoods it.
@@ -41,4 +40,4 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
   (add a typed default value, or make the column nullable), and a universal **"suppress with
   justification"** fix that adds `[SuppressMigrationLint(...)]` for any rule.
 
-_Not yet published to NuGet — reserve/push needs your API key; see docs/PHASE0-DECISION.md._
+_Distributed via GitHub Releases (not NuGet) — see the README for install-from-source._

@@ -178,7 +178,7 @@ migrationlint check ./Migrations --connection "$READONLY_CONN" --small-rows 1000
   `sys.partitions` (both metadata, no table scan). Short timeout; it never writes.
 - **Fails soft** — if the database is unreachable, it warns and continues with no stats, so the
   zero-config path is never blocked.
-- Supported providers: PostgreSQL, SQL Server. The threshold is also settable in config
+- Supported providers: PostgreSQL, SQL Server, MySQL. The threshold is also settable in config
   (`options.smallTableRowThreshold`).
 
 ## IDE analyzer (see violations as you type)
@@ -188,7 +188,7 @@ migrations project and the same rules run inside Visual Studio / Rider — the d
 the moment EF generates the migration, no build or CI round-trip:
 
 ```xml
-<PackageReference Include="MigrationLint.Analyzers" Version="0.1.0-preview.3">
+<PackageReference Include="MigrationLint.Analyzers" Version="0.1.0">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
