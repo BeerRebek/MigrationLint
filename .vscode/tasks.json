@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/MigrationLint.slnx"],
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "test",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["test", "${workspaceFolder}/MigrationLint.slnx"],
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "pack",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "pack",
+        "${workspaceFolder}/src/MigrationLint.Cli/MigrationLint.Cli.csproj",
+        "-c", "Release",
+        "-o", "${workspaceFolder}/artifacts"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "run: check sample",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project", "${workspaceFolder}/src/MigrationLint.Cli",
+        "-f", "net10.0",
+        "--",
+        "check", "${workspaceFolder}/samples/SampleApi"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

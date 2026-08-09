@@ -1,0 +1,9 @@
+{
+  "dotnet.defaultSolution": "MigrationLint.slnx",
+  "editor.formatOnSave": true,
+  "omnisharp.enableEditorConfigSupport": true,
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/BeerRebek/MigrationLint/main/schema/migrationlint.schema.json",
+  "title": "MigrationLint configuration",
+  "description": "Configuration for MigrationLint (migrationlint.json).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "provider": {
+      "description": "Database provider. Auto-detected when omitted.",
+      "enum": ["postgres", "sqlserver", "mysql", "sqlite"]
+    },
+    "migrationsPath": {
+      "description": "Path to the migrations folder. Auto-discovered when omitted.",
+      "type": "string"
+    },
+    "baseline": {
+      "description": "Migration id. Migrations lexically at or before it are skipped.",
+      "type": "string"
+    },
+    "deploymentStrategy": {
+      "description": "Deployment model. Changes which rules fire and at what severity.",
+      "enum": ["rolling", "bluegreen", "maintenance"],
+      "default": "rolling"
+    },
+    "failOn": {
+      "description": "Minimum severity that causes a non-zero exit code.",
+      "enum": ["error", "warning", "none"],
+      "default": "error"
+    },
+    "rules": {
+      "description": "Per-rule severity overrides, keyed by rule id (e.g. MIG007).",
+      "type": "object",
+      "patternProperties": {
+        "^MIG[0-9]{3}$": { "enum": ["error", "warning", "info", "off"] }
+      },
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxOperationsPerMigration": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10
+        },
+        "smallTables": {
+          "description": "Tables small enough that lock-acquiring operations are acceptable.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

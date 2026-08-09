@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/BeerRebek/MigrationLint/main/schema/migrationlint.schema.json",
+  "provider": "postgres",
+  "deploymentStrategy": "rolling",
+  "failOn": "error",
+  "rules": {
+    "MIG004": "warning"
+  },
+  "options": {
+    "maxOperationsPerMigration": 10,
+    "smallTables": ["Countries", "Currencies", "FeatureFlags"]
+  }
+}

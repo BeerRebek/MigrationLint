@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MigrationLint.Cli/MigrationLint.Cli.csproj" />
+    <Project Path="src/MigrationLint.Core/MigrationLint.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MigrationLint.Tests/MigrationLint.Tests.csproj" />
+  </Folder>
+</Solution>
