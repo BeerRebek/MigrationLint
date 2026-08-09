@@ -196,6 +196,11 @@ migrationlint check ./Migrations --connection "$READONLY_CONN" --small-rows 1000
 migrations project and the same rules run inside Visual Studio / Rider — the diagnostic appears
 the moment EF generates the migration, no build or CI round-trip:
 
+![Illustration: the MIG007 diagnostic and its code fix in the editor](docs/img/analyzer-lightbulb.png)
+
+*Illustration of the MIG007 diagnostic and the "Build the index CONCURRENTLY" code fix.*
+
+
 ```xml
 <PackageReference Include="MigrationLint.Analyzers" Version="0.1.0">
   <PrivateAssets>all</PrivateAssets>
