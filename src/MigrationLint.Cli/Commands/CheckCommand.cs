@@ -50,13 +50,37 @@ public static class CheckCommand
             stderr.WriteLine($"note: unmapped migrationBuilder methods encountered (skipped): {string.Join(", ", unmapped)}");
         }
 
-        var report = new RuleEngine().Run(migrations, provider, config, skipped);
+        if (args.Option("small-rows") is { } smallRows && int.TryParse(smallRows, out var threshold))
+        {
+            config = config with { Options = config.Options with { SmallTableRowThreshold = threshold } };
+        }
+
+        var rowCounts = ResolveRowCounts(args, provider, migrations, stderr);
+        var report = new RuleEngine().Run(migrations, provider, config, skipped, rowCounts);
         report = ApplyCliFilters(args, report);
 
         var output = Render(args, report, scanPath);
         WriteOutput(args, output, stdout);
 
         return report.MaxSeverity >= config.FailOn && config.FailOn != Severity.Off ? 1 : 0;
+    }
+
+    private static IReadOnlyDictionary<string, long>? ResolveRowCounts(
+        ParsedArgs args, Provider provider, IReadOnlyList<MigrationIr> migrations, TextWriter stderr)
+    {
+        if (args.Option("connection") is not { } connectionString || connectionString.Length == 0)
+        {
+            return null;
+        }
+
+        var tables = migrations
+            .SelectMany(m => m.UpOperations)
+            .SelectMany(o => new[] { o.Table, o.Name })
+            .Where(t => !string.IsNullOrEmpty(t))
+            .Select(t => t!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return TableStats.Query(provider, connectionString, tables, stderr);
     }
 
     private static LintConfig ResolveConfig(ParsedArgs args, string scanPath)

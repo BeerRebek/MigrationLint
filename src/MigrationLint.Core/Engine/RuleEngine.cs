@@ -29,9 +29,11 @@ public sealed class RuleEngine
         IReadOnlyList<MigrationIr> migrations,
         Provider provider,
         LintConfig config,
-        int skipped)
+        int skipped,
+        IReadOnlyDictionary<string, long>? rowCounts = null)
     {
         var smallTables = new HashSet<string>(config.Options.SmallTables, StringComparer.OrdinalIgnoreCase);
+        var counts = rowCounts ?? new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         var violations = new List<Violation>();
 
         foreach (var migration in migrations)
@@ -52,6 +54,8 @@ public sealed class RuleEngine
                 AllOperations = migration.UpOperations,
                 TablesCreatedInThisMigration = created,
                 SmallTables = smallTables,
+                RowCounts = counts,
+                SmallTableRowThreshold = config.Options.SmallTableRowThreshold,
                 Config = config,
             };
 

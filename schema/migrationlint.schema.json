@@ -46,6 +46,12 @@
           "minimum": 1,
           "default": 10
         },
+        "smallTableRowThreshold": {
+          "description": "With live stats (--connection), a table with at most this many rows is treated as small.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 10000
+        },
         "smallTables": {
           "description": "Tables small enough that lock-acquiring operations are acceptable.",
           "type": "array",

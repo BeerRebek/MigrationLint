@@ -13,7 +13,8 @@ public sealed class Mig006NullableToNotNull : RuleBase
 
     public override IEnumerable<Violation> Analyze(MigrationOperationIr op, LintContext ctx)
     {
-        if (op.Kind != OperationKind.AlterColumn || ctx.IsNewTable(op.Table))
+        // An empty table has no rows to hold NULL, so the tightening can't fail.
+        if (op.Kind != OperationKind.AlterColumn || ctx.IsNewTable(op.Table) || ctx.IsEmptyTable(op.Table))
         {
             return None;
         }

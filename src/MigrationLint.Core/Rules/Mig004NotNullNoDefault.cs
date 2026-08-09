@@ -13,7 +13,8 @@ public sealed class Mig004NotNullNoDefault : RuleBase
 
     public override IEnumerable<Violation> Analyze(MigrationOperationIr op, LintContext ctx)
     {
-        if (op.Kind != OperationKind.AddColumn || ctx.IsNewTable(op.Table))
+        // Empty tables can't fail a NOT NULL add — live stats cut this false positive.
+        if (op.Kind != OperationKind.AddColumn || ctx.IsNewTable(op.Table) || ctx.IsEmptyTable(op.Table))
         {
             return None;
         }

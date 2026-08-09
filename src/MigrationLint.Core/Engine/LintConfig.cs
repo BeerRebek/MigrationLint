@@ -6,6 +6,9 @@ public sealed record LintOptions
 {
     public int MaxOperationsPerMigration { get; init; } = 10;
     public IReadOnlyList<string> SmallTables { get; init; } = Array.Empty<string>();
+
+    /// <summary>With live stats, a table with at most this many rows is treated as small.</summary>
+    public int SmallTableRowThreshold { get; init; } = 10_000;
 }
 
 /// <summary>

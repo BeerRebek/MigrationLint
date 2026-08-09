@@ -164,6 +164,23 @@ jobs:
 | `sarif-file` | — | Also write a SARIF report to this path |
 | `args` | — | Extra raw args passed to `check` |
 
+## Live-DB awareness (opt-in, cuts false positives)
+
+Point the linter at a read-only connection and it uses real row counts to suppress noise: an
+**empty table can't fail a NOT NULL add** (MIG004/MIG006), and a **small table doesn't lock long**
+(MIG007/MIG008/MIG009).
+
+```bash
+migrationlint check ./Migrations --connection "$READONLY_CONN" --small-rows 10000
+```
+
+- **Read-only and estimate-based** — PostgreSQL uses `pg_class.reltuples`, SQL Server uses
+  `sys.partitions` (both metadata, no table scan). Short timeout; it never writes.
+- **Fails soft** — if the database is unreachable, it warns and continues with no stats, so the
+  zero-config path is never blocked.
+- Supported providers: PostgreSQL, SQL Server. The threshold is also settable in config
+  (`options.smallTableRowThreshold`).
+
 ## IDE analyzer (see violations as you type)
 
 `MigrationLint.Analyzers` is a Roslyn analyzer + code-fix package. Reference it from your

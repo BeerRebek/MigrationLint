@@ -16,4 +16,10 @@
     <ProjectReference Include="../MigrationLint.Core/MigrationLint.Core.csproj" />
   </ItemGroup>
 
+  <!-- Opt-in live-DB awareness for the connection option. Read-only, estimate-based queries only. -->
+  <ItemGroup>
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+
 </Project>

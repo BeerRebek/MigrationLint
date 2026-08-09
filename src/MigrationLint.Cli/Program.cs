@@ -66,6 +66,8 @@ static void PrintHelp(TextWriter stdout)
     stdout.WriteLine("  --rules <MIG001,MIG004>      --exclude-rules <MIG007>");
     stdout.WriteLine("  --category <dataloss|failure|locking|hygiene>");
     stdout.WriteLine("  --changed-only --base <git-ref>");
+    stdout.WriteLine("  --connection <conn-string>   read-only live row counts to cut false positives");
+    stdout.WriteLine("  --small-rows <n>             rows at/below which a table is treated as small");
     stdout.WriteLine("  --deployment-strategy <rolling|bluegreen|maintenance>");
     stdout.WriteLine("  --no-color");
 }

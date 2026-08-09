@@ -33,9 +33,13 @@ public static class TestHarness
         return migration;
     }
 
-    public static LintReport Run(string namePart, Provider provider, LintConfig? config = null)
+    public static LintReport Run(
+        string namePart,
+        Provider provider,
+        LintConfig? config = null,
+        IReadOnlyDictionary<string, long>? rowCounts = null)
     {
         var migration = Parse(namePart);
-        return new RuleEngine().Run(new[] { migration }, provider, config ?? new LintConfig(), skipped: 0);
+        return new RuleEngine().Run(new[] { migration }, provider, config ?? new LintConfig(), skipped: 0, rowCounts);
     }
 }

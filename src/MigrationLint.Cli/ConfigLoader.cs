@@ -103,6 +103,11 @@ public static class ConfigLoader
                     opts = opts with { MaxOperationsPerMigration = max.GetInt32() };
                 }
 
+                if (options.TryGetProperty("smallTableRowThreshold", out var threshold) && threshold.ValueKind == JsonValueKind.Number)
+                {
+                    opts = opts with { SmallTableRowThreshold = threshold.GetInt32() };
+                }
+
                 if (options.TryGetProperty("smallTables", out var st) && st.ValueKind == JsonValueKind.Array)
                 {
                     opts = opts with

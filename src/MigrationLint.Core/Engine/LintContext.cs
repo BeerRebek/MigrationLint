@@ -16,13 +16,29 @@ public sealed record LintContext
         new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     public ISet<string> SmallTables { get; init; } =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Live row counts by table (from <c>--connection</c>). Empty unless opted in.</summary>
+    public IReadOnlyDictionary<string, long> RowCounts { get; init; } =
+        new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Row count at or below which a table is treated as small (0 disables the row-count rule).</summary>
+    public int SmallTableRowThreshold { get; init; }
+
     public LintConfig Config { get; init; } = LintConfig.Default;
 
     public bool IsNewTable(string? table) =>
         table is not null && TablesCreatedInThisMigration.Contains(table);
 
+    /// <summary>Known live row count for a table, or null when no live stats are available.</summary>
+    public long? RowCount(string? table) =>
+        table is not null && RowCounts.TryGetValue(table, out var count) ? count : null;
+
+    /// <summary>True only when live stats confirm the table has zero rows.</summary>
+    public bool IsEmptyTable(string? table) => RowCount(table) == 0;
+
     public bool IsSmallTable(string? table) =>
-        table is not null && SmallTables.Contains(table);
+        (table is not null && SmallTables.Contains(table)) ||
+        (SmallTableRowThreshold > 0 && RowCount(table) is { } count && count <= SmallTableRowThreshold);
 
     /// <summary>Resolves the effective severity for a rule, honoring config overrides.</summary>
     public Severity SeverityFor(string ruleId, Severity fallback) =>
