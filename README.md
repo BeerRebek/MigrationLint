@@ -59,6 +59,10 @@ Tagged releases also attach the built `.nupkg` files to the
 
 ## Use
 
+Run `migrationlint --help` for the full picture of what you can do:
+
+![migrationlint --help overview](docs/img/help.png)
+
 ```bash
 migrationlint check ./src/Orders.Api          # auto-detects provider and migrations path
 migrationlint check --category locking        # try the differentiating rules first
@@ -235,6 +239,10 @@ public partial class AddUniqueSku : Migration { }
 A justification is required — omitting it is itself an error (MIG000).
 
 ## Rules
+
+`migrationlint list-rules` shows the whole catalog with default severities:
+
+![migrationlint list-rules](docs/img/list-rules.png)
 
 | Id | Category | Rule |
 |----|----------|------|
