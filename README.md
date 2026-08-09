@@ -1,5 +1,7 @@
 # MigrationLint
 
+[![CI](https://github.com/BeerRebek/MigrationLint/actions/workflows/ci.yml/badge.svg)](https://github.com/BeerRebek/MigrationLint/actions/workflows/ci.yml)
+
 **The EF Core migration linter that understands database locks.**
 
 An EF Core migration that succeeds instantly on an empty local database can take production
