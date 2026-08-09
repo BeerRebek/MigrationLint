@@ -56,9 +56,17 @@ public class LockRuleTests
     }
 
     [Fact]
-    public void Mig009_DoesNotFireOnSqlServer()
+    public void Mig009_FiresOnSqlServerWithNoCheckGuidance()
     {
         var report = TestHarness.Run("Bad_AddForeignKey", Provider.SqlServer);
+        var v = Assert.Single(report.Violations, x => x.RuleId == "MIG009");
+        Assert.Contains("WITH NOCHECK", v.SafeAlternative);
+    }
+
+    [Fact]
+    public void Mig009_DoesNotFireOnMySql()
+    {
+        var report = TestHarness.Run("Bad_AddForeignKey", Provider.MySql);
         Assert.DoesNotContain(report.Violations, v => v.RuleId == "MIG009");
     }
 }

@@ -13,25 +13,7 @@ staging, and fail in production.
 
 MigrationLint catches them at write time — no build, no database connection, no DbContext loading.
 
-```
-✖ MIG007  error   src/Orders.Api/Migrations/20260809103000_AddOrderNotes.cs:19
-  Orders(Notes)                                                      [locking]
-
-  Index 'IX_Orders_Notes' on 'Orders' is created without CONCURRENTLY.
-  PostgreSQL blocks writes to the table for the entire index build.
-
-  Safe alternative:
-      migrationBuilder.CreateIndex(
-              name: "IX_Orders_Notes", table: "Orders", column: "Notes")
-          .Annotation("Npgsql:CreatedConcurrently", true);
-
-      CREATE INDEX CONCURRENTLY cannot run inside a transaction, so this index
-      must be the only operation in its migration, with:
-
-        protected override bool SuppressTransaction => true;
-
-  Docs: https://github.com/BeerRebek/MigrationLint/blob/main/docs/rules/MIG007.md
-```
+![MigrationLint flagging a MIG007 lock violation](docs/img/mig007-violation.png)
 
 ## Why it's different
 
@@ -172,7 +154,7 @@ A justification is required — omitting it is itself an error (MIG000).
 |----|----------|------|
 | MIG007 | locking | Index created without CONCURRENTLY / ONLINE |
 | MIG008 | locking | Unique constraint / unique index added (table scan under lock) |
-| MIG009 | locking | Foreign key added without NOT VALID (PostgreSQL) |
+| MIG009 | locking | Foreign key added without deferred validation (PostgreSQL `NOT VALID` / SQL Server `WITH NOCHECK`) |
 | MIG010 | locking | Schema changes mixed with data changes |
 | MIG001 | dataloss | Column dropped |
 | MIG002 | dataloss | Table dropped |

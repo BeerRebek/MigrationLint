@@ -14,7 +14,8 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
   discovery, provider auto-detection (Postgres / SQL Server / MySQL / Sqlite).
 - Rule engine with pure `(operation, context)` rules and a migration-level rule pass.
 - Lock/downtime rules (the differentiators): **MIG007** (index without CONCURRENTLY/ONLINE),
-  **MIG008** (unique-constraint scan), **MIG009** (FK without NOT VALID), **MIG010** (mixed DDL/DML).
+  **MIG008** (unique-constraint scan), **MIG009** (FK without deferred validation — PostgreSQL
+  `NOT VALID` and SQL Server `WITH NOCHECK`), **MIG010** (mixed DDL/DML).
 - Data-loss & failure rules: MIG001–MIG006, MIG011 (destructive raw SQL), MIG012 (too many ops),
   MIG000 (suppression without justification).
 - Config file (`migrationlint.json`), `[SuppressMigrationLint]` attribute, and baseline filtering.
