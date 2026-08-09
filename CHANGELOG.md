@@ -15,6 +15,13 @@ All notable changes to MigrationLint are documented here. Format follows
     forcing a per-row rewrite.
 - Parser now maps `AddPrimaryKey` / `AddCheckConstraint`, reads `defaultValueSql` text, and resolves
   `oldClrType: typeof(...)` arguments.
+- Four more EF-aware rules:
+  - **MIG017** — a `CreatedConcurrently` index without `SuppressTransaction` (fails at runtime).
+  - **MIG018** — a migration checked in without a `ModelSnapshot` update (drift), detected by comparing
+    the newest migration's `BuildTargetModel` with the snapshot's `BuildModel`.
+  - **MIG019** — a stored computed column added to an existing table (per-row rewrite).
+  - **MIG020** — `DropIndex` without `CONCURRENTLY` on PostgreSQL.
+- Parser reads `computedColumnSql` / `stored` and detects the `SuppressTransaction` override.
 
 ## [0.1.1] — 2026-08-09
 

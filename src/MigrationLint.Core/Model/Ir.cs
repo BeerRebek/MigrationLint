@@ -67,6 +67,8 @@ public sealed record ColumnInfo
     public bool HasDefault { get; init; }
     public string? DefaultValue { get; init; }
     public string? DefaultValueSql { get; init; }
+    public string? ComputedColumnSql { get; init; }
+    public bool? IsStored { get; init; }
 }
 
 public sealed record MigrationOperationIr
@@ -103,6 +105,9 @@ public sealed record MigrationIr
 
     /// <summary>True when a suppression attribute with a justification but no explicit rule ids is present.</summary>
     public bool SuppressesAllRules { get; init; }
+
+    /// <summary>True when the migration overrides <c>SuppressTransaction</c> to return true.</summary>
+    public bool SuppressesTransaction { get; init; }
 
     /// <summary>True when a <c>[SuppressMigrationLint]</c> attribute is present but has no justification (drives MIG000).</summary>
     public bool HasSuppressionWithoutJustification { get; init; }

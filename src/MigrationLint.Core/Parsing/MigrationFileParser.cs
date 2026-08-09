@@ -56,6 +56,7 @@ public static class MigrationFileParser
 
         var id = Path.GetFileNameWithoutExtension(filePath);
         ParseSuppression(migrationClass, out var justification, out var rules, out var suppressAll, out var invalid);
+        var suppressesTransaction = DetectSuppressTransaction(migrationClass);
 
         var up = ParseMethod(migrationClass, "Up", filePath, tree, unmapped);
         var down = ParseMethod(migrationClass, "Down", filePath, tree, unmapped);
@@ -70,6 +71,7 @@ public static class MigrationFileParser
             SuppressionJustification = justification,
             SuppressesAllRules = suppressAll,
             HasSuppressionWithoutJustification = invalid,
+            SuppressesTransaction = suppressesTransaction,
         };
 
         unmappedMethods = unmapped.ToArray();
@@ -149,6 +151,23 @@ public static class MigrationFileParser
 
         rules = ruleIds;
         suppressAll = ruleIds.Count == 0;
+    }
+
+    private static bool DetectSuppressTransaction(ClassDeclarationSyntax cls)
+    {
+        var prop = cls.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .FirstOrDefault(p => p.Identifier.ValueText == "SuppressTransaction");
+
+        if (prop is null)
+        {
+            return false;
+        }
+
+        // Matches both `=> true;` and a getter that returns true.
+        return prop.DescendantNodes()
+            .OfType<LiteralExpressionSyntax>()
+            .Any(l => l.RawKind == (int)SyntaxKind.TrueLiteralExpression);
     }
 
     private static string? AttributeName(AttributeSyntax attribute) =>
@@ -261,6 +280,8 @@ public static class MigrationFileParser
         var hasDefault = !isOld && (args.IsPresentAndNotNull("defaultValue") || args.IsPresentAndNotNull("defaultValueSql"));
         var defaultValue = isOld ? null : args.String("defaultValue");
         var defaultValueSql = isOld ? null : args.String("defaultValueSql");
+        var computedColumnSql = isOld ? null : args.String("computedColumnSql");
+        var isStored = isOld ? null : args.Bool("stored");
 
         // Only materialize an old column for AlterColumn, where old* args exist.
         var anySet = clr is not null || store is not null || maxLength is not null ||
@@ -284,6 +305,8 @@ public static class MigrationFileParser
             HasDefault = hasDefault,
             DefaultValue = defaultValue,
             DefaultValueSql = defaultValueSql,
+            ComputedColumnSql = computedColumnSql,
+            IsStored = isStored,
         };
     }
 

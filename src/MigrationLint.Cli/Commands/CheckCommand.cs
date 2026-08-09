@@ -57,12 +57,79 @@ public static class CheckCommand
 
         var rowCounts = ResolveRowCounts(args, provider, migrations, stderr);
         var report = new RuleEngine().Run(migrations, provider, config, skipped, rowCounts);
+
+        if (DetectSnapshotDrift(files, config) is { } drift)
+        {
+            report = report with { Violations = report.Violations.Append(drift).ToArray() };
+        }
+
         report = ApplyCliFilters(args, report);
 
         var output = Render(args, report, scanPath);
         WriteOutput(args, output, stdout);
 
         return report.MaxSeverity >= config.FailOn && config.FailOn != Severity.Off ? 1 : 0;
+    }
+
+    /// <summary>MIG018 — compares the newest migration's target model with the ModelSnapshot to catch drift.</summary>
+    private static Violation? DetectSnapshotDrift(IReadOnlyList<string> files, LintConfig config)
+    {
+        var severity = config.Rules.TryGetValue("MIG018", out var s) ? s : Severity.Warning;
+        if (severity == Severity.Off || files.Count == 0)
+        {
+            return null;
+        }
+
+        var newest = files[files.Count - 1];
+        var designer = newest.Substring(0, newest.Length - ".cs".Length) + ".Designer.cs";
+        var dir = Path.GetDirectoryName(newest) ?? ".";
+        string? snapshot;
+        try
+        {
+            snapshot = Directory.GetFiles(dir, "*ModelSnapshot.cs").FirstOrDefault();
+        }
+        catch
+        {
+            return null;
+        }
+
+        if (snapshot is null || !File.Exists(designer))
+        {
+            return null;
+        }
+
+        string snapshotSource, designerSource;
+        try
+        {
+            snapshotSource = File.ReadAllText(snapshot);
+            designerSource = File.ReadAllText(designer);
+        }
+        catch
+        {
+            return null;
+        }
+
+        if (!SnapshotDrift.HasDrift(snapshotSource, designerSource))
+        {
+            return null;
+        }
+
+        return new Violation
+        {
+            RuleId = "MIG018",
+            Category = RuleCategory.Hygiene,
+            Severity = severity,
+            MigrationId = Path.GetFileNameWithoutExtension(newest),
+            Source = new SourceSpan(snapshot, 1, 1),
+            Target = Path.GetFileName(snapshot),
+            Message = $"'{Path.GetFileName(snapshot)}' does not match the newest migration's target model. " +
+                      "A migration was likely committed without updating the snapshot (a common merge-conflict " +
+                      "bug) — the next generated migration will be wrong.",
+            SafeAlternative = "Regenerate the snapshot so it reflects every migration:\n" +
+                              "  1. Resolve the merge so the ModelSnapshot includes all applied migrations, or\n" +
+                              "  2. Re-run 'dotnet ef migrations add' after removing the conflicting one.\n" +
+                              "Verify with: dotnet ef migrations has-pending-model-changes",
+        };
     }
 
     private static IReadOnlyDictionary<string, long>? ResolveRowCounts(

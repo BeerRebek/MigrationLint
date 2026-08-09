@@ -275,6 +275,10 @@ A justification is required — omitting it is itself an error (MIG000).
 | MIG014 | locking | Primary key added to an existing table |
 | MIG015 | locking | Integer type widened (forces a table rewrite) |
 | MIG016 | locking | Column added with a volatile default (forces a table rewrite) |
+| MIG019 | locking | Stored computed column added (forces a table rewrite) |
+| MIG020 | locking | Index dropped without CONCURRENTLY (PostgreSQL) |
+| MIG017 | failure | CONCURRENTLY index without `SuppressTransaction` (fails at runtime) |
+| MIG018 | hygiene | Migration checked in without a ModelSnapshot update (drift) |
 | MIG001 | dataloss | Column dropped |
 | MIG002 | dataloss | Table dropped |
 | MIG003 | dataloss | Column or table renamed |

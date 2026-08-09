@@ -20,6 +20,8 @@ public static class RuleCatalog
         new Mig014AddPrimaryKey(),
         new Mig015WideningRewrite(),
         new Mig016VolatileDefault(),
+        new Mig019ComputedColumn(),
+        new Mig020DropIndexConcurrently(),
     };
 
     public static IReadOnlyList<IMigrationLevelRule> MigrationRules { get; } = new IMigrationLevelRule[]
@@ -27,12 +29,21 @@ public static class RuleCatalog
         new Mig000InvalidSuppression(),
         new Mig010MixedDdlDml(),
         new Mig012TooManyOperations(),
+        new Mig017SuppressTransaction(),
+    };
+
+    /// <summary>Corpus-level checks that need the whole migration set + snapshot (run by the CLI, not per-op).</summary>
+    public static IReadOnlyList<RuleInfo> CorpusRules { get; } = new[]
+    {
+        new RuleInfo("MIG018", "Migration checked in without a ModelSnapshot update",
+            Model.Severity.Warning, Model.RuleCategory.Hygiene),
     };
 
     /// <summary>All rule ids and metadata, for list-rules / SARIF driver / explain.</summary>
     public static IReadOnlyList<RuleInfo> All { get; } =
         OperationRules.Select(r => new RuleInfo(r.Id, r.Title, r.DefaultSeverity, r.Category))
             .Concat(MigrationRules.Select(r => new RuleInfo(r.Id, r.Title, r.DefaultSeverity, r.Category)))
+            .Concat(CorpusRules)
             .OrderBy(r => r.Id, StringComparer.Ordinal)
             .ToArray();
 }
