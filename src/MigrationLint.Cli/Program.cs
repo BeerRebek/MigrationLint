@@ -11,13 +11,29 @@ if (args.Length == 1 && args[0] is "--version" or "-v")
     return 0;
 }
 
-if (args.Length == 0 || args[0] is "--help" or "-h" or "help")
+// Top-level help: no args, or a bare help/--help/-h with no command after it.
+if (args.Length == 0 ||
+    (args[0] is "--help" or "-h" or "help" && args.Length == 1))
 {
-    PrintHelp(stdout);
+    Help.General(stdout);
+    return 0;
+}
+
+// `migrationlint help <command>` → that command's help.
+if (args[0] == "help" && args.Length >= 2)
+{
+    PrintCommandHelp(args[1], stdout);
     return 0;
 }
 
 var parsed = ParsedArgs.Parse(args);
+
+// `migrationlint <command> --help|-h` → that command's help.
+if (parsed.Command is not null && (parsed.Flag("help") || parsed.Flag("h") || HasShortHelp(args)))
+{
+    PrintCommandHelp(parsed.Command, stdout);
+    return 0;
+}
 
 try
 {
@@ -47,27 +63,16 @@ static string Version() =>
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
     ?? "0.0.0";
 
-static void PrintHelp(TextWriter stdout)
+static bool HasShortHelp(string[] args) => args.Contains("-h");
+
+static void PrintCommandHelp(string command, TextWriter stdout)
 {
-    stdout.WriteLine("MigrationLint — the EF Core migration linter that understands database locks.");
-    stdout.WriteLine();
-    stdout.WriteLine("Usage:");
-    stdout.WriteLine("  migrationlint check [path] [options]");
-    stdout.WriteLine("  migrationlint baseline [path]");
-    stdout.WriteLine("  migrationlint explain <MIG004>");
-    stdout.WriteLine("  migrationlint list-rules");
-    stdout.WriteLine("  migrationlint --version");
-    stdout.WriteLine();
-    stdout.WriteLine("check options:");
-    stdout.WriteLine("  --provider <postgres|sqlserver|mysql|sqlite>");
-    stdout.WriteLine("  --config <file>              --baseline <migration-id>");
-    stdout.WriteLine("  --format <console|github|sarif|json>   (default: console)");
-    stdout.WriteLine("  --output <file>              --fail-on <error|warning|none>");
-    stdout.WriteLine("  --rules <MIG001,MIG004>      --exclude-rules <MIG007>");
-    stdout.WriteLine("  --category <dataloss|failure|locking|hygiene>");
-    stdout.WriteLine("  --changed-only --base <git-ref>");
-    stdout.WriteLine("  --connection <conn-string>   read-only live row counts to cut false positives");
-    stdout.WriteLine("  --small-rows <n>             rows at/below which a table is treated as small");
-    stdout.WriteLine("  --deployment-strategy <rolling|bluegreen|maintenance>");
-    stdout.WriteLine("  --no-color");
+    switch (command)
+    {
+        case "check": Help.Check(stdout); break;
+        case "baseline": Help.Baseline(stdout); break;
+        case "explain": Help.Explain(stdout); break;
+        case "list-rules": ListRulesCommand.Run(stdout); break;
+        default: Help.General(stdout); break;
+    }
 }
