@@ -7,9 +7,9 @@
 
 **The EF Core migration linter that understands database locks.**
 
-> 🎉 **v0.1.0 is here — first stable release.** Lock-first rules across PostgreSQL, SQL Server, and
-> MySQL, a GitHub Action, an IDE analyzer with code fixes, and opt-in live-DB awareness.
-> [Read the release notes →](https://github.com/BeerRebek/MigrationLint/releases/tag/v0.1.0)
+> 🎉 **v0.3.0** — 21 lock-aware rules across PostgreSQL, SQL Server, and MySQL, `migrationlint plan`
+> (deployment sequencing), an IDE analyzer with code fixes, a GitHub Action, and opt-in live-DB
+> awareness. [Read the release notes →](https://github.com/BeerRebek/MigrationLint/releases/latest)
 
 An EF Core migration that succeeds instantly on an empty local database can take production
 down when it runs against a table with millions of rows. `CREATE INDEX` blocks writes for the
@@ -40,8 +40,12 @@ MigrationLint leads with the problem no other .NET tool addresses — **lock and
 
 1. **Lock/downtime rules** — `CONCURRENTLY`, `ONLINE = ON`, `NOT VALID` foreign keys, unique-constraint scans.
 2. **Provider awareness** — dialect-correct rules for PostgreSQL, SQL Server, and MySQL, not generic warnings.
-3. **Adoptable on existing repos** — baseline, config, and per-migration suppression.
-4. **CI-native** — SARIF, GitHub annotations, and PR-diff mode.
+3. **Deployment sequencing** — `migrationlint plan` turns an unsafe migration into the safe
+   expand → migrate → contract deploys it should have been.
+4. **Live-DB awareness** — opt-in, read-only stats cut false positives (empty/small tables, columns
+   with no NULLs) and add real scale to messages.
+5. **Adoptable & CI-native** — baseline, config, per-migration suppression; SARIF, GitHub
+   annotations, and PR-diff mode.
 
 Data-loss rules (dropped columns/tables, renames, type narrowing, NOT NULL failures) are table
 stakes and included — but they are not the lead.
@@ -244,7 +248,7 @@ real lightbulb.*
 
 
 ```xml
-<PackageReference Include="MigrationLint.Analyzers" Version="0.1.0">
+<PackageReference Include="MigrationLint.Analyzers" Version="0.3.0">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
