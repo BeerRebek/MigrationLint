@@ -6,6 +6,10 @@
 
 **The EF Core migration linter that understands database locks.**
 
+> 🎉 **v0.1.0 is here — first stable release.** Lock-first rules across PostgreSQL, SQL Server, and
+> MySQL, a GitHub Action, an IDE analyzer with code fixes, and opt-in live-DB awareness.
+> [Read the release notes →](https://github.com/BeerRebek/MigrationLint/releases/tag/v0.1.0)
+
 An EF Core migration that succeeds instantly on an empty local database can take production
 down when it runs against a table with millions of rows. `CREATE INDEX` blocks writes for the
 whole build. Adding a foreign key validates every existing row under a lock. A dropped column
