@@ -26,6 +26,7 @@ All notable changes to MigrationLint are documented here. Format follows
   `AddCheckConstraint` into the two-step `NOT VALID` + `VALIDATE` (PostgreSQL) or `WITH NOCHECK` +
   `WITH CHECK CHECK` (SQL Server) form.
 - **`--format markdown`** — a PR-summary table (rules linked to docs) for posting as a PR comment.
+- **`migrationlint init`** — scaffolds a starter `migrationlint.json` with the detected provider.
 
 ## [0.1.1] — 2026-08-09
 

@@ -82,6 +82,7 @@ migrationlint check ./src/Orders.Api          # auto-detects provider and migrat
 migrationlint check --category locking        # try the differentiating rules first
 migrationlint check --format sarif -o results.sarif
 migrationlint check --changed-only --base main
+migrationlint init ./src/Orders.Api           # scaffold a migrationlint.json
 migrationlint list-rules
 migrationlint explain MIG007
 migrationlint baseline ./src/Orders.Api        # suggest a baseline for a mature repo

@@ -40,6 +40,7 @@ try
     return parsed.Command switch
     {
         "check" => CheckCommand.Run(parsed, stdout, stderr),
+        "init" => InitCommand.Run(parsed, stdout, stderr),
         "baseline" => BaselineCommand.Run(parsed, stdout, stderr),
         "explain" => ExplainCommand.Run(parsed, stdout, stderr),
         "list-rules" => ListRulesCommand.Run(stdout),
