@@ -21,6 +21,19 @@ MigrationLint catches them at write time — no build, no database connection, n
 
 ![MigrationLint flagging a MIG007 lock violation](docs/img/mig007-violation.png)
 
+## On the GitHub Marketplace
+
+Add migration safety to any workflow in one line — no install step:
+
+```yaml
+- uses: BeerRebek/MigrationLint@v1
+  with:
+    path: src/Orders.Api/Migrations
+```
+
+[**View on the GitHub Marketplace →**](https://github.com/marketplace/actions/migrationlint) · see
+[Use in CI](#use-in-ci-github-action) for SARIF code scanning and PR-diff mode.
+
 ## Why it's different
 
 MigrationLint leads with the problem no other .NET tool addresses — **lock and downtime safety**:
