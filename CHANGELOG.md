@@ -3,6 +3,17 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
+## [0.1.1] — 2026-08-09
+
+### Added
+- Runnable `samples/SampleApi` project wired to the analyzer package, so the diagnostics and
+  lightbulb code fixes can be reproduced (and screenshotted) in Visual Studio / Rider.
+- README screenshots: CLI `--help` overview, `list-rules`, and the IDE analyzer lightbulb.
+
+### Changed
+- Marketplace-ready GitHub Action metadata (concise description within the 125-char limit,
+  `shield` branding). No behavioral change to the Action.
+
 ## [0.1.0] — 2026-08-09
 
 First stable release. Distribution is GitHub-only — install as a `dotnet tool` from source or a
