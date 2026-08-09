@@ -17,6 +17,11 @@
   <ItemGroup>
     <ProjectReference Include="../../src/MigrationLint.Cli/MigrationLint.Cli.csproj" />
     <ProjectReference Include="../../src/MigrationLint.Core/MigrationLint.Core.csproj" />
+    <ProjectReference Include="../../src/MigrationLint.Analyzers/MigrationLint.Analyzers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
   </ItemGroup>
 
   <!-- Fixtures are plain text, copied to output; never compiled. -->

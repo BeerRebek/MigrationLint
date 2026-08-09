@@ -30,6 +30,7 @@ jobs:
         run: |
           dotnet pack src/MigrationLint.Cli/MigrationLint.Cli.csproj --configuration Release --no-build --output ./artifacts
           dotnet pack src/MigrationLint.Core/MigrationLint.Core.csproj --configuration Release --no-build --output ./artifacts
+          dotnet pack src/MigrationLint.Analyzers/MigrationLint.Analyzers.csproj --configuration Release --no-build --output ./artifacts
 
       # Distribution is GitHub-only: the built .nupkg files are attached to the release so
       # developers can install the tool from source or from the downloaded package.

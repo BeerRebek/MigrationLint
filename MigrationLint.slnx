@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/MigrationLint.Analyzers/MigrationLint.Analyzers.csproj" />
     <Project Path="src/MigrationLint.Cli/MigrationLint.Cli.csproj" />
     <Project Path="src/MigrationLint.Core/MigrationLint.Core.csproj" />
   </Folder>

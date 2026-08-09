@@ -164,6 +164,30 @@ jobs:
 | `sarif-file` | — | Also write a SARIF report to this path |
 | `args` | — | Extra raw args passed to `check` |
 
+## IDE analyzer (see violations as you type)
+
+`MigrationLint.Analyzers` is a Roslyn analyzer + code-fix package. Reference it from your
+migrations project and the same rules run inside Visual Studio / Rider — the diagnostic appears
+the moment EF generates the migration, no build or CI round-trip:
+
+```xml
+<PackageReference Include="MigrationLint.Analyzers" Version="0.1.0-preview.3">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+```
+
+(Install from a downloaded release `.nupkg` via a local NuGet source, e.g. a `nuget.config`
+`<add key="local" value="./packages" />`.)
+
+MIG007 ships with a **code fix** — the lightbulb appends `.Annotation("Npgsql:CreatedConcurrently",
+true)` (or `SqlServer:Online`) for you. Tune severities in `.editorconfig`:
+
+```ini
+dotnet_diagnostic.MIG007.severity = error
+dotnet_diagnostic.MIG012.severity = none
+```
+
 ## Configure
 
 `migrationlint.json`, discovered by walking up from the scan path:

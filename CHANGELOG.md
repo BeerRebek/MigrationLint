@@ -31,5 +31,8 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
 - Reusable **GitHub Action** (`uses: BeerRebek/MigrationLint@v1`) with inline PR annotations,
   optional SARIF for code scanning, `changed-only` PR-diff mode, and a self-scan workflow that
   dogfoods it.
+- **Roslyn analyzer** (`MigrationLint.Analyzers`, netstandard2.0) — the same rules run inline in
+  Visual Studio / Rider, plus a MIG007 code fix that inserts the concurrent/online index
+  annotation. Reuses the CLI's rule engine unchanged (the payoff of the pure-rule architecture).
 
 _Not yet published to NuGet — reserve/push needs your API key; see docs/PHASE0-DECISION.md._
