@@ -1,6 +1,7 @@
 bin/
 obj/
 artifacts/
+samples/SampleApi/packages/
 *.user
 .vs/
 .idea/

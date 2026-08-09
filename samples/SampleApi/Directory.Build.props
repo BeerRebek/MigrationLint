@@ -1,0 +1,4 @@
+<Project>
+  <!-- Present so the repo-root Directory.Build.props (warnings-as-errors, MinVer, etc.)
+       does NOT apply to this standalone sample. Intentionally minimal. -->
+</Project>

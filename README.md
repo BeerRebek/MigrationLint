@@ -198,7 +198,9 @@ the moment EF generates the migration, no build or CI round-trip:
 
 ![Illustration: the MIG007 diagnostic and its code fix in the editor](docs/img/analyzer-lightbulb.png)
 
-*Illustration of the MIG007 diagnostic and the "Build the index CONCURRENTLY" code fix.*
+*Illustration of the MIG007 diagnostic and the "Build the index CONCURRENTLY" code fix. A runnable
+demo lives in [`samples/SampleApi`](samples/SampleApi/README.md) — open it in Rider/VS to see the
+real lightbulb.*
 
 
 ```xml

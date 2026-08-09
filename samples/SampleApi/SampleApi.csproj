@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <!-- Keep the intentional MIG* diagnostics as diagnostics, not build breakers. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Provides the Migration / MigrationBuilder types and the Npgsql provider fingerprint. -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+
+    <!-- The MigrationLint analyzer + code fixes (bundles MigrationLint.Core). -->
+    <PackageReference Include="MigrationLint.Analyzers" Version="0.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>analyzers;build</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,7 @@
+<Project>
+  <!-- The sample pins its own package versions inline, independent of the repo's
+       central package management. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

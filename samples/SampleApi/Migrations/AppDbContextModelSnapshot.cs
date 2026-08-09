@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using SampleApi;
 
 namespace SampleApi.Migrations;
 
@@ -8,9 +9,7 @@ public partial class AppDbContextModelSnapshot : ModelSnapshot
 {
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
-        // Provider fingerprint: MigrationLint auto-detects PostgreSQL from Npgsql: annotations.
-        modelBuilder
-            .HasAnnotation("ProductVersion", "8.0.0")
-            .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+        // The "Npgsql:" prefix is how MigrationLint auto-detects the PostgreSQL provider.
+        modelBuilder.HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
     }
 }

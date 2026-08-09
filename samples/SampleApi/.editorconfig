@@ -1,0 +1,8 @@
+root = true
+
+[*.cs]
+# Keep the sample buildable: show the MigrationLint diagnostics as warnings (still squiggled,
+# still offer the lightbulb code fixes) rather than build-breaking errors. Flip to `error` to
+# see them in red.
+dotnet_diagnostic.MIG007.severity = warning
+dotnet_diagnostic.MIG004.severity = warning
