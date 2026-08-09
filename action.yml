@@ -1,9 +1,11 @@
 name: MigrationLint
-description: Lint EF Core migrations for lock/downtime and data-loss safety before they reach production.
 author: BeerRebek
+description: >-
+  The EF Core migration linter that understands database locks — catch lock/downtime and
+  data-loss risks in CI.
 
 branding:
-  icon: database
+  icon: shield
   color: purple
 
 inputs:
