@@ -1,6 +1,7 @@
 # MigrationLint
 
 [![CI](https://github.com/BeerRebek/MigrationLint/actions/workflows/ci.yml/badge.svg)](https://github.com/BeerRebek/MigrationLint/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/BeerRebek/MigrationLint?sort=semver&label=release)](https://github.com/BeerRebek/MigrationLint/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/BeerRebek/MigrationLint/blob/main/LICENSE)
 
 **The EF Core migration linter that understands database locks.**
