@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*' # e.g. v0.1.0-preview.1
+      - 'v*.*.*' # semver releases only, e.g. v0.1.0-preview.1 (not the 'v1' action alias)
 
 jobs:
   release:

@@ -1,0 +1,38 @@
+name: Self scan
+
+# Dogfoods the MigrationLint action against the bundled sample app and uploads the
+# results to GitHub code scanning (visible inline on PRs and in the Security tab).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run MigrationLint (local action)
+        uses: ./
+        with:
+          path: samples/SampleApi
+          provider: postgres
+          # The sample contains deliberate violations, so don't fail the build here —
+          # we just want the SARIF report uploaded for demonstration.
+          fail-on: none
+          sarif-file: migrationlint.sarif
+
+      - name: Upload SARIF to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: migrationlint.sarif
+          category: migrationlint

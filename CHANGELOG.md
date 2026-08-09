@@ -28,5 +28,8 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
   MinVer git-tag versioning.
 - Validated: parser ran clean against 514 real migrations across bitwarden/server, dotnet/eShop,
   and jellyfin (see docs/VALIDATION-CORPUS.md).
+- Reusable **GitHub Action** (`uses: BeerRebek/MigrationLint@v1`) with inline PR annotations,
+  optional SARIF for code scanning, `changed-only` PR-diff mode, and a self-scan workflow that
+  dogfoods it.
 
 _Not yet published to NuGet — reserve/push needs your API key; see docs/PHASE0-DECISION.md._

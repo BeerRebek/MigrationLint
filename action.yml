@@ -1,0 +1,91 @@
+name: MigrationLint
+description: Lint EF Core migrations for lock/downtime and data-loss safety before they reach production.
+author: BeerRebek
+
+branding:
+  icon: database
+  color: purple
+
+inputs:
+  path:
+    description: Path to scan for migrations (a Migrations folder or a project/solution root).
+    required: false
+    default: "."
+  provider:
+    description: "Database provider: postgres | sqlserver | mysql | sqlite. Auto-detected when omitted."
+    required: false
+    default: ""
+  config:
+    description: Path to a migrationlint.json config file.
+    required: false
+    default: ""
+  fail-on:
+    description: "Minimum severity that fails the step: error | warning | none."
+    required: false
+    default: "error"
+  changed-only:
+    description: "If true, only check migrations added in this PR (uses git diff against 'base')."
+    required: false
+    default: "false"
+  base:
+    description: Git ref to diff against when changed-only is true.
+    required: false
+    default: "main"
+  sarif-file:
+    description: If set, also write a SARIF report to this path (upload it with github/codeql-action/upload-sarif).
+    required: false
+    default: ""
+  args:
+    description: Extra raw arguments passed through to `migrationlint check`.
+    required: false
+    default: ""
+  dotnet-version:
+    description: .NET SDK version used to build and run the tool.
+    required: false
+    default: "8.0.x"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Run MigrationLint
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_PROVIDER: ${{ inputs.provider }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_CHANGED_ONLY: ${{ inputs.changed-only }}
+        INPUT_BASE: ${{ inputs.base }}
+        INPUT_SARIF_FILE: ${{ inputs.sarif-file }}
+        INPUT_ARGS: ${{ inputs.args }}
+      run: |
+        set -euo pipefail
+
+        # Build and install the tool from this action's checked-out source.
+        pkg="$RUNNER_TEMP/migrationlint-pkg"
+        tool="$RUNNER_TEMP/migrationlint-tool"
+        dotnet pack "$GITHUB_ACTION_PATH/src/MigrationLint.Cli/MigrationLint.Cli.csproj" \
+          -c Release -o "$pkg" --nologo -v quiet
+        dotnet tool install --tool-path "$tool" --add-source "$pkg" --prerelease MigrationLint.Cli >/dev/null
+        bin="$tool/migrationlint"
+
+        # Assemble arguments common to both runs.
+        args=(check "$INPUT_PATH")
+        [ -n "$INPUT_PROVIDER" ] && args+=(--provider "$INPUT_PROVIDER")
+        [ -n "$INPUT_CONFIG" ]   && args+=(--config "$INPUT_CONFIG")
+        [ "$INPUT_CHANGED_ONLY" = "true" ] && args+=(--changed-only --base "$INPUT_BASE")
+        [ -n "$INPUT_ARGS" ] && args+=($INPUT_ARGS)
+
+        # Optional SARIF artifact (never fails the step; upload it separately).
+        if [ -n "$INPUT_SARIF_FILE" ]; then
+          "$bin" "${args[@]}" --format sarif --output "$INPUT_SARIF_FILE" --fail-on none || true
+          echo "Wrote SARIF report to $INPUT_SARIF_FILE"
+        fi
+
+        # Primary run: inline GitHub annotations, honoring fail-on for the step's exit code.
+        "$bin" "${args[@]}" --format github --fail-on "$INPUT_FAIL_ON"

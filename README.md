@@ -27,13 +27,6 @@ MigrationLint leads with the problem no other .NET tool addresses — **lock and
 Data-loss rules (dropped columns/tables, renames, type narrowing, NOT NULL failures) are table
 stakes and included — but they are not the lead.
 
-### Compared to `EfMigrationSafety.Cli`
-
-`EfMigrationSafety.Cli` exists and covers data-loss checks. It does **not** implement any
-lock/downtime rules, has no provider awareness, and (as of v0.1.4) produces a false positive on
-NOT NULL columns added to a table created in the same migration. MigrationLint is built lock-first
-and provider-aware from the ground up. See [docs/PHASE0-DECISION.md](docs/PHASE0-DECISION.md).
-
 ## Install
 
 MigrationLint is distributed from this repository (not NuGet). Install it as a local `dotnet tool`
@@ -123,6 +116,53 @@ public partial class AddOrderNotes : Migration
 ```
 
 The process exits `1`, so the CI step fails and the unsafe migration never merges.
+
+## Use in CI (GitHub Action)
+
+Add the action to any workflow — it builds and runs the linter for you:
+
+```yaml
+- uses: BeerRebek/MigrationLint@v1
+  with:
+    path: src/Orders.Api/Migrations
+    provider: postgres          # optional; auto-detected otherwise
+    fail-on: error              # error | warning | none
+```
+
+Violations appear as inline annotations on the PR. To also surface them in the **Security → Code
+scanning** tab, emit SARIF and upload it:
+
+```yaml
+jobs:
+  migration-safety:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }     # needed for changed-only
+      - uses: BeerRebek/MigrationLint@v1
+        with:
+          path: src/Orders.Api/Migrations
+          changed-only: "true"        # only check migrations added in this PR
+          base: main
+          sarif-file: migrationlint.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: migrationlint.sarif
+```
+
+| Input | Default | Description |
+|---|---|---|
+| `path` | `.` | Folder or project/solution root to scan |
+| `provider` | auto | `postgres` \| `sqlserver` \| `mysql` \| `sqlite` |
+| `config` | — | Path to `migrationlint.json` |
+| `fail-on` | `error` | Severity that fails the step |
+| `changed-only` / `base` | `false` / `main` | Check only PR-added migrations |
+| `sarif-file` | — | Also write a SARIF report to this path |
+| `args` | — | Extra raw args passed to `check` |
 
 ## Configure
 
