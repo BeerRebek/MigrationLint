@@ -3,6 +3,19 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
+## [0.2.0] — unreleased
+
+### Added
+- Four new lock/downtime rules (ship as **warning** per the new-rule policy):
+  - **MIG013** — check constraint added without deferred validation (PostgreSQL `NOT VALID` /
+    SQL Server `WITH NOCHECK`).
+  - **MIG014** — primary key added to an existing table (unique-index build / clustered rewrite under lock).
+  - **MIG015** — integer type widened (`int` → `bigint`), forcing a full table rewrite.
+  - **MIG016** — column added with a volatile default (`now()`, `gen_random_uuid()`, `NEWID()`, …),
+    forcing a per-row rewrite.
+- Parser now maps `AddPrimaryKey` / `AddCheckConstraint`, reads `defaultValueSql` text, and resolves
+  `oldClrType: typeof(...)` arguments.
+
 ## [0.1.1] — 2026-08-09
 
 ### Added

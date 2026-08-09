@@ -16,6 +16,10 @@ public static class RuleCatalog
         new Mig005NarrowType(),
         new Mig006NullableToNotNull(),
         new Mig011DestructiveSql(),
+        new Mig013CheckConstraint(),
+        new Mig014AddPrimaryKey(),
+        new Mig015WideningRewrite(),
+        new Mig016VolatileDefault(),
     };
 
     public static IReadOnlyList<IMigrationLevelRule> MigrationRules { get; } = new IMigrationLevelRule[]

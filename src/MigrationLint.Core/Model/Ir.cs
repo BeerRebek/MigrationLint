@@ -18,6 +18,8 @@ public enum OperationKind
     InsertData,
     UpdateData,
     DeleteData,
+    AddPrimaryKey,
+    AddCheckConstraint,
 }
 
 public enum Provider
@@ -64,6 +66,7 @@ public sealed record ColumnInfo
     public bool? IsNullable { get; init; }
     public bool HasDefault { get; init; }
     public string? DefaultValue { get; init; }
+    public string? DefaultValueSql { get; init; }
 }
 
 public sealed record MigrationOperationIr

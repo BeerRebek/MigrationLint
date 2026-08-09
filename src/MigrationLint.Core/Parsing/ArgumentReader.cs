@@ -28,6 +28,8 @@ public sealed class ReadArguments
             ["AlterColumn"] = new[] { "name", "table" },
             ["AddForeignKey"] = new[] { "name", "table", "column" },
             ["AddUniqueConstraint"] = new[] { "name", "table", "column" },
+            ["AddPrimaryKey"] = new[] { "name", "table", "column" },
+            ["AddCheckConstraint"] = new[] { "name", "table", "sql" },
         };
 
     private readonly Dictionary<string, ExpressionSyntax> _byName =
@@ -90,6 +92,17 @@ public sealed class ReadArguments
         }
 
         return AsString(expr);
+    }
+
+    /// <summary>Reads a CLR type name from either <c>typeof(int)</c> or a string literal.</summary>
+    public string? TypeName(string name)
+    {
+        if (!_byName.TryGetValue(name, out var expr))
+        {
+            return null;
+        }
+
+        return expr is TypeOfExpressionSyntax typeOf ? typeOf.Type.ToString() : AsString(expr);
     }
 
     public bool? Bool(string name)

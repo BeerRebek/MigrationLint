@@ -31,6 +31,8 @@ public static class MigrationFileParser
             ["InsertData"] = OperationKind.InsertData,
             ["UpdateData"] = OperationKind.UpdateData,
             ["DeleteData"] = OperationKind.DeleteData,
+            ["AddPrimaryKey"] = OperationKind.AddPrimaryKey,
+            ["AddCheckConstraint"] = OperationKind.AddCheckConstraint,
         };
 
     /// <summary>Method names seen on migrationBuilder that we do not map — collected for the corpus review.</summary>
@@ -250,7 +252,7 @@ public static class MigrationFileParser
 
         string P(string name) => isOld ? "old" + char.ToUpperInvariant(name[0]) + name.Substring(1) : name;
 
-        var clr = isOld ? args.String("oldClrType") : args.GenericTypeArgument;
+        var clr = isOld ? args.TypeName("oldClrType") : args.GenericTypeArgument;
         var store = args.String(P("type"));
         var maxLength = args.Int(P("maxLength"));
         var precision = args.Int(P("precision"));
@@ -258,6 +260,7 @@ public static class MigrationFileParser
         var nullable = args.Bool(P("nullable"));
         var hasDefault = !isOld && (args.IsPresentAndNotNull("defaultValue") || args.IsPresentAndNotNull("defaultValueSql"));
         var defaultValue = isOld ? null : args.String("defaultValue");
+        var defaultValueSql = isOld ? null : args.String("defaultValueSql");
 
         // Only materialize an old column for AlterColumn, where old* args exist.
         var anySet = clr is not null || store is not null || maxLength is not null ||
@@ -280,6 +283,7 @@ public static class MigrationFileParser
             IsNullable = nullable,
             HasDefault = hasDefault,
             DefaultValue = defaultValue,
+            DefaultValueSql = defaultValueSql,
         };
     }
 

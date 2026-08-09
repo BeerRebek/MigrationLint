@@ -271,6 +271,10 @@ A justification is required — omitting it is itself an error (MIG000).
 | MIG008 | locking | Unique constraint / unique index added (table scan under lock) |
 | MIG009 | locking | Foreign key added without deferred validation (PostgreSQL `NOT VALID` / SQL Server `WITH NOCHECK`) |
 | MIG010 | locking | Schema changes mixed with data changes |
+| MIG013 | locking | Check constraint added without deferred validation |
+| MIG014 | locking | Primary key added to an existing table |
+| MIG015 | locking | Integer type widened (forces a table rewrite) |
+| MIG016 | locking | Column added with a volatile default (forces a table rewrite) |
 | MIG001 | dataloss | Column dropped |
 | MIG002 | dataloss | Table dropped |
 | MIG003 | dataloss | Column or table renamed |
