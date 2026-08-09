@@ -15,6 +15,7 @@ public static class Help
         o.WriteLine();
         o.WriteLine("COMMANDS");
         o.WriteLine("  check [path]        Lint migrations under [path] (default: current directory).");
+        o.WriteLine("  plan [path]         Show each migration as a safe deployment sequence.");
         o.WriteLine("  init [path]         Scaffold a starter migrationlint.json (detects your provider).");
         o.WriteLine("  baseline [path]     Suggest a baseline id so an existing repo starts clean.");
         o.WriteLine("  explain <MIG007>    Show a rule's category, severity, and docs link.");

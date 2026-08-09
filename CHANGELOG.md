@@ -3,6 +3,12 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
+## [0.3.0] — unreleased
+
+### Added
+- **`migrationlint plan`** — reframes each migration as a safe deployment sequence
+  (expand → migrate → contract), driven by the same rules that flag the operations.
+
 ## [0.2.0] — 2026-08-10
 
 Eight new rules (13 → 21), a code fix, a markdown format, and `init`.

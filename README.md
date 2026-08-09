@@ -82,6 +82,7 @@ migrationlint check ./src/Orders.Api          # auto-detects provider and migrat
 migrationlint check --category locking        # try the differentiating rules first
 migrationlint check --format sarif -o results.sarif
 migrationlint check --changed-only --base main
+migrationlint plan ./src/Orders.Api           # show each migration as a safe deploy sequence
 migrationlint init ./src/Orders.Api           # scaffold a migrationlint.json
 migrationlint list-rules
 migrationlint explain MIG007
@@ -140,6 +141,26 @@ public partial class AddOrderNotes : Migration
 ```
 
 The process exits `1`, so the CI step fails and the unsafe migration never merges.
+
+### Deployment plan
+
+`migrationlint plan` reframes the problem as *deployment sequencing* — it turns an unsafe migration
+into the safe expand → migrate → contract steps it should have been:
+
+```
+20260809103000_AddOrderNotes — 2 deploys recommended
+
+  Deploy 1 · expand (safe to deploy now)
+    • Add column Orders.Notes as nullable (no default)      [MIG004]
+    • Create index IX_Orders_Notes CONCURRENTLY on Orders   [MIG007]
+
+  Deploy 2 · migrate (backfill / validate)
+    • Backfill Orders.Notes in batches, then set NOT NULL   [MIG004]
+
+  The current migration attempts all of this in one step.
+```
+
+See [docs/DEPLOYMENT-PLAN.md](docs/DEPLOYMENT-PLAN.md) for the phase model.
 
 ## Use in CI (GitHub Action)
 
