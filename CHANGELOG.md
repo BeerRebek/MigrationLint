@@ -32,7 +32,9 @@ Distribution is GitHub-only — install as a `dotnet tool` from source (see the 
   optional SARIF for code scanning, `changed-only` PR-diff mode, and a self-scan workflow that
   dogfoods it.
 - **Roslyn analyzer** (`MigrationLint.Analyzers`, netstandard2.0) — the same rules run inline in
-  Visual Studio / Rider, plus a MIG007 code fix that inserts the concurrent/online index
-  annotation. Reuses the CLI's rule engine unchanged (the payoff of the pure-rule architecture).
+  Visual Studio / Rider. Reuses the CLI's rule engine unchanged (the payoff of the pure-rule
+  architecture). Code fixes: **MIG007** (insert concurrent/online index annotation), **MIG004**
+  (add a typed default value, or make the column nullable), and a universal **"suppress with
+  justification"** fix that adds `[SuppressMigrationLint(...)]` for any rule.
 
 _Not yet published to NuGet — reserve/push needs your API key; see docs/PHASE0-DECISION.md._

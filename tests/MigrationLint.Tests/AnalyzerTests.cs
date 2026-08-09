@@ -25,14 +25,39 @@ public class AnalyzerTests
         };
 
         var compilation = CSharpCompilation.Create(
-            "AnalyzerTest",
-            trees,
+            "AnalyzerTest", trees,
             new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
         var withAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(new MigrationLintAnalyzer()));
 
         return await withAnalyzers.GetAnalyzerDiagnosticsAsync();
+    }
+
+    /// <summary>Runs a code-fix provider on the fixture and returns the resulting document text for the chosen action.</summary>
+    private static async Task<string> ApplyFix(
+        string fixturePath, string ruleId, CodeFixProvider provider, string? equivalenceKey = null)
+    {
+        var source = File.ReadAllText(TestHarness.FixturePath(fixturePath));
+        var diagnostic = Assert.Single(await Analyze(fixturePath), d => d.Id == ruleId);
+
+        using var workspace = new AdhocWorkspace();
+        var project = workspace
+            .AddProject("P", LanguageNames.CSharp)
+            .AddMetadataReference(MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
+        var document = project.AddDocument(fixturePath + ".cs", source, filePath: fixturePath + ".cs");
+
+        var actions = new List<CodeAction>();
+        var context = new CodeFixContext(document, diagnostic, (a, _) => actions.Add(a), CancellationToken.None);
+        await provider.RegisterCodeFixesAsync(context);
+
+        var action = equivalenceKey is null
+            ? actions.Single()
+            : actions.Single(a => a.EquivalenceKey == equivalenceKey);
+
+        var operations = await action.GetOperationsAsync(CancellationToken.None);
+        var applied = ((ApplyChangesOperation)operations.Single()).ChangedSolution;
+        return (await applied.GetDocument(document.Id)!.GetTextAsync()).ToString();
     }
 
     [Fact]
@@ -50,31 +75,31 @@ public class AnalyzerTests
     }
 
     [Fact]
-    public async Task CodeFix_AppendsConcurrentlyAnnotation()
+    public async Task Mig007CodeFix_AppendsConcurrentlyAnnotation()
     {
-        var migrationPath = "Bad_CreateIndexNoConcurrently.cs";
-        var source = File.ReadAllText(TestHarness.FixturePath("Bad_CreateIndexNoConcurrently"));
-        var diagnostic = Assert.Single(await Analyze("Bad_CreateIndexNoConcurrently"), d => d.Id == "MIG007");
+        var text = await ApplyFix("Bad_CreateIndexNoConcurrently", "MIG007", new Mig007CodeFixProvider());
+        Assert.Contains("Npgsql:CreatedConcurrently", text);
+    }
 
-        using var workspace = new AdhocWorkspace();
-        var project = workspace
-            .AddProject("P", LanguageNames.CSharp)
-            .AddMetadataReference(MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
-        var document = project.AddDocument(migrationPath, source, filePath: migrationPath);
+    [Fact]
+    public async Task Mig004CodeFix_AddsDefaultValue()
+    {
+        var text = await ApplyFix("Bad_AddNotNullNoDefault", "MIG004", new Mig004CodeFixProvider(), "MIG004-default");
+        Assert.Contains("defaultValue:", text);
+    }
 
-        CodeAction? registered = null;
-        var context = new CodeFixContext(
-            document, diagnostic,
-            (action, _) => registered = action,
-            CancellationToken.None);
+    [Fact]
+    public async Task Mig004CodeFix_MakesColumnNullable()
+    {
+        var text = await ApplyFix("Bad_AddNotNullNoDefault", "MIG004", new Mig004CodeFixProvider(), "MIG004-nullable");
+        Assert.Contains("nullable: true", text);
+    }
 
-        await new Mig007CodeFixProvider().RegisterCodeFixesAsync(context);
-        Assert.NotNull(registered);
-
-        var operations = await registered!.GetOperationsAsync(CancellationToken.None);
-        var applied = ((ApplyChangesOperation)operations.Single()).ChangedSolution;
-        var newText = (await applied.GetDocument(document.Id)!.GetTextAsync()).ToString();
-
-        Assert.Contains("Npgsql:CreatedConcurrently", newText);
+    [Fact]
+    public async Task SuppressCodeFix_AddsAttributeWithRuleId()
+    {
+        var text = await ApplyFix("Bad_CreateIndexNoConcurrently", "MIG007", new SuppressCodeFixProvider());
+        Assert.Contains("SuppressMigrationLint", text);
+        Assert.Contains("MIG007", text);
     }
 }
