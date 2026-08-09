@@ -3,11 +3,14 @@
 All notable changes to MigrationLint are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
-## [0.3.0] — unreleased
+## [0.3.0] — 2026-08-10
 
 ### Added
 - **`migrationlint plan`** — reframes each migration as a safe deployment sequence
   (expand → migrate → contract), driven by the same rules that flag the operations.
+- **Live-DB enrichment** (`--connection`): MIG006 is cleared when the column has zero NULLs, and
+  violation messages gain the real row count (e.g. `… (Orders has ~4,238,901 rows)`).
+  NULL counts are queried for PostgreSQL, SQL Server, and MySQL.
 
 ## [0.2.0] — 2026-08-10
 

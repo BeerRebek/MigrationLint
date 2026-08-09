@@ -32,6 +32,12 @@ public abstract class RuleBase : IMigrationRule
             yield break;
         }
 
+        // Enrich with real scale when live stats are available (from --connection).
+        if (ctx.RowCount(op.Table) is { } rows && rows > 0)
+        {
+            message += $" ({op.Table} has ~{rows.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} rows)";
+        }
+
         yield return new Violation
         {
             RuleId = Id,

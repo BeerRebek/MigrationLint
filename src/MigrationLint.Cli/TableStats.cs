@@ -1,4 +1,5 @@
 using System.Data;
+using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using MigrationLint.Core.Model;
 using MySqlConnector;
@@ -50,6 +51,60 @@ public static class TableStats
         {
             // Never fail the lint because the database was unreachable — degrade to no stats.
             stderr.WriteLine($"warning: could not read live table stats ({ex.GetType().Name}: {ex.Message}); continuing without them.");
+            return new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        return result;
+    }
+
+    /// <summary>Counts NULLs for specific (table, column) pairs — used to clear MIG006 false positives.</summary>
+    public static IReadOnlyDictionary<string, long> QueryNullCounts(
+        Provider provider,
+        string connectionString,
+        IReadOnlyCollection<(string Table, string Column)> pairs,
+        TextWriter stderr)
+    {
+        var result = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+        if (pairs.Count == 0)
+        {
+            return result;
+        }
+
+        Func<DbConnection>? open = provider switch
+        {
+            Provider.PostgreSql => () => new NpgsqlConnection(connectionString),
+            Provider.SqlServer => () => new SqlConnection(connectionString),
+            Provider.MySql => () => new MySqlConnection(connectionString),
+            _ => null,
+        };
+
+        Func<string, string> quote = provider switch
+        {
+            Provider.SqlServer => s => $"[{s}]",
+            Provider.MySql => s => $"`{s}`",
+            _ => s => $"\"{s}\"",
+        };
+
+        if (open is null)
+        {
+            return result;
+        }
+
+        try
+        {
+            using var conn = open();
+            conn.Open();
+            foreach (var (table, column) in pairs)
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.CommandTimeout = TimeoutSeconds;
+                cmd.CommandText = $"SELECT COUNT(*) FROM {quote(table)} WHERE {quote(column)} IS NULL;";
+                result[$"{table}.{column}"] = Convert.ToInt64(cmd.ExecuteScalar());
+            }
+        }
+        catch (Exception ex)
+        {
+            stderr.WriteLine($"warning: could not read live NULL counts ({ex.GetType().Name}: {ex.Message}); continuing without them.");
             return new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         }
 

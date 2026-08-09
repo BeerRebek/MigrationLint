@@ -24,6 +24,10 @@ public sealed record LintContext
     /// <summary>Row count at or below which a table is treated as small (0 disables the row-count rule).</summary>
     public int SmallTableRowThreshold { get; init; }
 
+    /// <summary>Live NULL counts keyed by "table.column" (from <c>--connection</c>). Empty unless opted in.</summary>
+    public IReadOnlyDictionary<string, long> NullCounts { get; init; } =
+        new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+
     public LintConfig Config { get; init; } = LintConfig.Default;
 
     public bool IsNewTable(string? table) =>
@@ -35,6 +39,15 @@ public sealed record LintContext
 
     /// <summary>True only when live stats confirm the table has zero rows.</summary>
     public bool IsEmptyTable(string? table) => RowCount(table) == 0;
+
+    /// <summary>Known live NULL count for a column, or null when no live stats are available.</summary>
+    public long? NullCount(string? table, string? column) =>
+        table is not null && column is not null && NullCounts.TryGetValue($"{table}.{column}", out var count)
+            ? count
+            : null;
+
+    /// <summary>True only when live stats confirm the column has zero NULLs.</summary>
+    public bool HasNoNulls(string? table, string? column) => NullCount(table, column) == 0;
 
     public bool IsSmallTable(string? table) =>
         (table is not null && SmallTables.Contains(table)) ||

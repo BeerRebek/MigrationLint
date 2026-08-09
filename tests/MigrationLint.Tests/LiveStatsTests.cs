@@ -44,4 +44,28 @@ public class LiveStatsTests
         var report = TestHarness.Run("Bad_CreateIndexNoConcurrently", Provider.PostgreSql, rowCounts: Rows("Orders", 5_000_000));
         Assert.Contains(report.Violations, v => v.RuleId == "MIG007");
     }
+
+    [Fact]
+    public void RowCount_EnrichesTheMessageWithScale()
+    {
+        var report = TestHarness.Run("Bad_CreateIndexNoConcurrently", Provider.PostgreSql, rowCounts: Rows("Orders", 4_238_901));
+        var v = Assert.Single(report.Violations, x => x.RuleId == "MIG007");
+        Assert.Contains("4,238,901 rows", v.Message);
+    }
+
+    [Fact]
+    public void Mig006_DoesNotFire_WhenColumnHasNoNulls()
+    {
+        var nulls = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase) { ["Orders.Status"] = 0 };
+        var report = TestHarness.Run("Bad_NullableToNotNull", Provider.PostgreSql, nullCounts: nulls);
+        Assert.DoesNotContain(report.Violations, v => v.RuleId == "MIG006");
+    }
+
+    [Fact]
+    public void Mig006_StillFires_WhenColumnHasNulls()
+    {
+        var nulls = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase) { ["Orders.Status"] = 42 };
+        var report = TestHarness.Run("Bad_NullableToNotNull", Provider.PostgreSql, nullCounts: nulls);
+        Assert.Contains(report.Violations, v => v.RuleId == "MIG006");
+    }
 }

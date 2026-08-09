@@ -56,7 +56,8 @@ public static class CheckCommand
         }
 
         var rowCounts = ResolveRowCounts(args, provider, migrations, stderr);
-        var report = new RuleEngine().Run(migrations, provider, config, skipped, rowCounts);
+        var nullCounts = ResolveNullCounts(args, provider, migrations, stderr);
+        var report = new RuleEngine().Run(migrations, provider, config, skipped, rowCounts, nullCounts);
 
         if (DetectSnapshotDrift(files, config) is { } drift)
         {
@@ -148,6 +149,27 @@ public static class CheckCommand
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         return TableStats.Query(provider, connectionString, tables, stderr);
+    }
+
+    private static IReadOnlyDictionary<string, long>? ResolveNullCounts(
+        ParsedArgs args, Provider provider, IReadOnlyList<MigrationIr> migrations, TextWriter stderr)
+    {
+        if (args.Option("connection") is not { } connectionString || connectionString.Length == 0)
+        {
+            return null;
+        }
+
+        // Only the columns being tightened to NOT NULL matter for MIG006.
+        var pairs = migrations
+            .SelectMany(m => m.UpOperations)
+            .Where(o => o.Kind == OperationKind.AlterColumn &&
+                        o.OldColumn?.IsNullable == true && o.Column?.IsNullable == false &&
+                        !string.IsNullOrEmpty(o.Table) && !string.IsNullOrEmpty(o.Name))
+            .Select(o => (o.Table!, o.Name!))
+            .Distinct()
+            .ToList();
+
+        return TableStats.QueryNullCounts(provider, connectionString, pairs, stderr);
     }
 
     private static LintConfig ResolveConfig(ParsedArgs args, string scanPath)

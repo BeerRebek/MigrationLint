@@ -37,9 +37,11 @@ public static class TestHarness
         string namePart,
         Provider provider,
         LintConfig? config = null,
-        IReadOnlyDictionary<string, long>? rowCounts = null)
+        IReadOnlyDictionary<string, long>? rowCounts = null,
+        IReadOnlyDictionary<string, long>? nullCounts = null)
     {
         var migration = Parse(namePart);
-        return new RuleEngine().Run(new[] { migration }, provider, config ?? new LintConfig(), skipped: 0, rowCounts);
+        return new RuleEngine().Run(
+            new[] { migration }, provider, config ?? new LintConfig(), skipped: 0, rowCounts, nullCounts);
     }
 }

@@ -211,9 +211,13 @@ jobs:
 
 ## Live-DB awareness (opt-in, cuts false positives)
 
-Point the linter at a read-only connection and it uses real row counts to suppress noise: an
-**empty table can't fail a NOT NULL add** (MIG004/MIG006), and a **small table doesn't lock long**
-(MIG007/MIG008/MIG009).
+Point the linter at a read-only connection and it uses real database stats to cut noise and add
+scale:
+
+- an **empty table can't fail a NOT NULL add** (MIG004/MIG006) → not flagged;
+- a **small table doesn't lock long** (MIG007/MIG008/MIG009) → not flagged;
+- a **column with zero NULLs** can be set NOT NULL safely (MIG006) → not flagged;
+- violation messages gain the real **row count** — e.g. `… (Orders has ~4,238,901 rows)`.
 
 ```bash
 migrationlint check ./Migrations --connection "$READONLY_CONN" --small-rows 10000
