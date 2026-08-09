@@ -91,6 +91,57 @@ migrationlint baseline ./src/Orders.Api        # suggest a baseline for a mature
 
 Exit codes: `0` clean · `1` violations at/above `--fail-on` · `2` config error · `3` no migrations found.
 
+### Example
+
+Given this EF-generated migration (PostgreSQL):
+
+```csharp
+public partial class AddOrderNotes : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AddColumn<string>(
+            name: "Notes", table: "Orders", type: "text", nullable: false);
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Orders_Notes", table: "Orders", column: "Notes");
+    }
+}
+```
+
+`migrationlint check ./Migrations` reports both problems before they reach production:
+
+```
+✖ MIG004  error   Migrations/20260809103000_AddOrderNotes.cs:13
+  Orders.Notes                                                       [failure]
+
+  Adding NOT NULL column 'Orders.Notes' without a default value. This
+  statement fails immediately if the table contains any rows.
+
+  Safe alternative:
+    Option A — supply a default (single deployment):
+      migrationBuilder.AddColumn<string>(
+          name: "Notes", table: "Orders",
+          nullable: false, defaultValue: "");
+    ...
+
+✖ MIG007  error   Migrations/20260809103000_AddOrderNotes.cs:19
+  Orders(Notes)                                                      [locking]
+
+  Index 'IX_Orders_Notes' on 'Orders' is created without CONCURRENTLY.
+  PostgreSQL blocks writes to the table for the entire index build.
+
+  Safe alternative:
+      migrationBuilder.CreateIndex(
+              name: "IX_Orders_Notes", table: "Orders", column: "Notes")
+          .Annotation("Npgsql:CreatedConcurrently", true);
+    ...
+
+2 errors, 0 warnings across 1 migration.
+```
+
+The process exits `1`, so the CI step fails and the unsafe migration never merges.
+
 ## Configure
 
 `migrationlint.json`, discovered by walking up from the scan path:
