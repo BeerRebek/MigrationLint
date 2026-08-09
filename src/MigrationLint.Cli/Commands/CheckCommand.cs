@@ -251,6 +251,7 @@ public static class CheckCommand
             "github" => new GitHubFormatter(Relativize).Format(report),
             "sarif" => new SarifFormatter(Relativize).Format(report),
             "json" => new JsonFormatter(Relativize).Format(report),
+            "markdown" => new MarkdownFormatter(Relativize).Format(report),
             _ => throw new ConfigException($"unknown format '{format}'."),
         };
     }

@@ -59,7 +59,7 @@ public static class Help
         o.WriteLine("  --category <dataloss|failure|locking|hygiene>  Report only this category.");
         o.WriteLine();
         o.WriteLine("OUTPUT");
-        o.WriteLine("  --format <console|github|sarif|json>           Default: console.");
+        o.WriteLine("  --format <console|github|sarif|json|markdown>  Default: console.");
         o.WriteLine("  --output <file>                                Write to a file instead of stdout.");
         o.WriteLine("  --fail-on <error|warning|none>                 Severity that exits non-zero (error).");
         o.WriteLine("  --no-color                                     Disable ANSI color.");

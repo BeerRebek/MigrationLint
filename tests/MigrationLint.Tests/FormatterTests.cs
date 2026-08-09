@@ -41,6 +41,15 @@ public class FormatterTests
     }
 
     [Fact]
+    public void MarkdownFormatterProducesTableWithLinkedRule()
+    {
+        var output = new MarkdownFormatter().Format(SampleReport());
+        Assert.Contains("## MigrationLint", output);
+        Assert.Contains("[MIG007](https://github.com/BeerRebek/MigrationLint", output);
+        Assert.Contains("| | Rule | Location | Issue |", output);
+    }
+
+    [Fact]
     public void SarifFormatterProducesValid_2_1_0_Structure()
     {
         var output = new SarifFormatter().Format(SampleReport());

@@ -102,4 +102,21 @@ public class AnalyzerTests
         Assert.Contains("SuppressMigrationLint", text);
         Assert.Contains("MIG007", text);
     }
+
+    [Fact]
+    public async Task Mig009CodeFix_SplitsForeignKeyIntoNotValid()
+    {
+        var text = await ApplyFix("Bad_AddForeignKey", "MIG009", new FkCheckConstraintCodeFixProvider());
+        Assert.Contains("NOT VALID", text);
+        Assert.Contains("VALIDATE CONSTRAINT", text);
+        Assert.Contains("migrationBuilder.Sql(", text);
+    }
+
+    [Fact]
+    public async Task Mig013CodeFix_SplitsCheckConstraintIntoNotValid()
+    {
+        var text = await ApplyFix("Bad_AddCheckConstraint", "MIG013", new FkCheckConstraintCodeFixProvider());
+        Assert.Contains("NOT VALID", text);
+        Assert.Contains("CHECK (", text);
+    }
 }

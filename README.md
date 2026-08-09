@@ -227,8 +227,13 @@ real lightbulb.*
 (Install from a downloaded release `.nupkg` via a local NuGet source, e.g. a `nuget.config`
 `<add key="local" value="./packages" />`.)
 
-MIG007 ships with a **code fix** — the lightbulb appends `.Annotation("Npgsql:CreatedConcurrently",
-true)` (or `SqlServer:Online`) for you. Tune severities in `.editorconfig`:
+Several rules ship with **code fixes** — the lightbulb rewrites the migration for you:
+- **MIG007** → appends `.Annotation("Npgsql:CreatedConcurrently", true)` / `SqlServer:Online`
+- **MIG004** → adds a typed default value, or makes the column nullable
+- **MIG009 / MIG013** → splits into the two-step `NOT VALID` / `WITH NOCHECK` deferred validation
+- **any rule** → "suppress with justification" (`[SuppressMigrationLint(...)]`)
+
+Tune severities in `.editorconfig`:
 
 ```ini
 dotnet_diagnostic.MIG007.severity = error

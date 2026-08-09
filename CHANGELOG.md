@@ -22,6 +22,10 @@ All notable changes to MigrationLint are documented here. Format follows
   - **MIG019** — a stored computed column added to an existing table (per-row rewrite).
   - **MIG020** — `DropIndex` without `CONCURRENTLY` on PostgreSQL.
 - Parser reads `computedColumnSql` / `stored` and detects the `SuppressTransaction` override.
+- **Code fix for MIG009 / MIG013** — the analyzer lightbulb splits an `AddForeignKey`/
+  `AddCheckConstraint` into the two-step `NOT VALID` + `VALIDATE` (PostgreSQL) or `WITH NOCHECK` +
+  `WITH CHECK CHECK` (SQL Server) form.
+- **`--format markdown`** — a PR-summary table (rules linked to docs) for posting as a PR comment.
 
 ## [0.1.1] — 2026-08-09
 
