@@ -1,8 +1,8 @@
 root = true
 
 [*.cs]
-# Keep the sample buildable: show the MigrationLint diagnostics as warnings (still squiggled,
-# still offer the lightbulb code fixes) rather than build-breaking errors. Flip to `error` to
-# see them in red.
-dotnet_diagnostic.MIG007.severity = warning
-dotnet_diagnostic.MIG004.severity = warning
+# Show the MigrationLint diagnostics as errors — red squiggles in the editor (best for a
+# screenshot). The IDE still shows them live even though `dotnet build` will now report errors.
+# Change to `warning` if you'd rather the sample build cleanly.
+dotnet_diagnostic.MIG007.severity = error
+dotnet_diagnostic.MIG004.severity = error

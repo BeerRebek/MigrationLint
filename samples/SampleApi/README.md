@@ -38,5 +38,6 @@ Open `samples/SampleApi` in **Rider** or **Visual Studio**, open
 That popup is the real version of `docs/img/analyzer-lightbulb.png` — screenshot it and drop it in
 over that file.
 
-> Tip: the `.editorconfig` here downgrades the rules to `warning` so the sample still builds. Change
-> them to `error` to see the diagnostics in red.
+> Tip: the `.editorconfig` here sets the rules to `error` (red squiggles, best for a screenshot).
+> The IDE shows them live even though `dotnet build` will then report errors. Switch them to
+> `warning` if you'd rather the sample build cleanly.
